@@ -15,15 +15,8 @@ Nesse repositório contém meus estudos sobre RabbitMQ e exemplos de implementa�
   - [Casos de Uso](#casos-de-uso)
 - [Algoritmos](#algoritmos)
   - [Round Robin](#round-robin)
-    - [Explicação](#explicação)
-    - [Casos de Uso](#casos-de-uso-1)
   - [Fanout](#fanout)
-    - [Explicação](#explicação-1)
-    - [Casos de Uso](#casos-de-uso-2)
   - [Direct](#direct)
-    - [Explicação](#explicação-2)
-    - [Casos de Uso](#casos-de-uso-3)
-   
 
 ---
 
