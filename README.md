@@ -2,8 +2,6 @@
     <a href="https://www.rabbitmq.com/docs"><img alt="Banner RabbitMQ" title="RabbitMQ" src="https://taking.com.br/wp-content/uploads/2024/05/RabbitMQ-1.jpg" /></a>
 </h3>
 
-<h1 align="center">🐰 RABBITMQ</h1>
-
 Nesse repositório contém meus estudos sobre RabbitMQ e exemplos de implementação utilizando diferentes algoritmos de roteamento de mensagens.
 
 ---
