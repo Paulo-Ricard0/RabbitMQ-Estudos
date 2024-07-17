@@ -16,7 +16,7 @@ for (int i = 0; i < 6; i++)
 
 	channel.BasicPublish(
 		exchange: "direct_logs",
-		routingKey: $"{logLevels[i]}",
+		routingKey: logLevels[i],
 		basicProperties: null,
 		body: body);
 

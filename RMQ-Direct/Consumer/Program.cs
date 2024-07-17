@@ -9,9 +9,11 @@ using var channel = connection.CreateModel();
 channel.ExchangeDeclare(exchange: "direct_logs", type: ExchangeType.Direct);
 
 var guid = Guid.NewGuid();
+var errorQueueName = $"error_queue-{guid}";
+var generalQueueName = $"general_queue-{guid}";
 
-var errorQueueName = channel.QueueDeclare(queue: $"error_queue-{guid}").QueueName;
-var generalQueueName = channel.QueueDeclare(queue: $"general_queue-{guid}").QueueName;
+channel.QueueDeclare(queue: errorQueueName);
+channel.QueueDeclare(queue: generalQueueName);
 
 channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
 
@@ -19,39 +21,56 @@ channel.QueueBind(queue: errorQueueName, exchange: "direct_logs", routingKey: "e
 channel.QueueBind(queue: generalQueueName, exchange: "direct_logs", routingKey: "warning");
 channel.QueueBind(queue: generalQueueName, exchange: "direct_logs", routingKey: "info");
 
-Console.WriteLine(" [*] Waiting for messages.");
+Console.WriteLine("Which log queue to consume?");
+Console.WriteLine("To consume the general queue type: general");
+Console.WriteLine("To consume the error queue type: error");
 
-var errorConsumer = new EventingBasicConsumer(channel);
-errorConsumer.Received += (model, ea) =>
+var queueName = Console.ReadLine();
+
+if (queueName == "error")
 {
-	var body = ea.Body.ToArray();
-	var message = Encoding.UTF8.GetString(body);
+	Console.Clear();
+	Console.WriteLine(" [*] Waiting for messages.");
 
-	Console.WriteLine($" [x] {errorQueueName} Received: {message}");
+	var errorConsumer = new EventingBasicConsumer(channel);
+	errorConsumer.Received += (model, ea) =>
+	{
+		var body = ea.Body.ToArray();
+		var message = Encoding.UTF8.GetString(body);
 
-	Thread.Sleep(3 * 1000);
+		Console.WriteLine($" [x] {errorQueueName} Received: {message}");
 
-	Console.WriteLine(" [x] Done  \n");
+		Thread.Sleep(3 * 1000);
 
-	channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-};
-channel.BasicConsume(queue: errorQueueName, autoAck: false, consumer: errorConsumer);
+		Console.WriteLine(" [x] Done  \n");
 
-var generalConsumer = new EventingBasicConsumer(channel);
-generalConsumer.Received += (model, ea) =>
+		channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+	};
+
+	channel.BasicConsume(queue: errorQueueName, autoAck: false, consumer: errorConsumer);
+}
+else if (queueName == "general")
 {
-	var body = ea.Body.ToArray();
-	var message = Encoding.UTF8.GetString(body);
+	Console.Clear();
+	Console.WriteLine(" [*] Waiting for messages.");
 
-	Console.WriteLine($" [x] {generalQueueName} Received: {message}");
+	var generalConsumer = new EventingBasicConsumer(channel);
+	generalConsumer.Received += (model, ea) =>
+	{
+		var body = ea.Body.ToArray();
+		var message = Encoding.UTF8.GetString(body);
 
-	Thread.Sleep(3 * 1000);
+		Console.WriteLine($" [x] {generalQueueName} Received: {message}");
 
-	Console.WriteLine(" [x] Done \n");
+		Thread.Sleep(3 * 1000);
 
-	channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-};
-channel.BasicConsume(queue: generalQueueName, autoAck: false, consumer: generalConsumer);
+		Console.WriteLine(" [x] Done \n");
+
+		channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+	};
+
+	channel.BasicConsume(queue: generalQueueName, autoAck: false, consumer: generalConsumer);
+}
 
 Console.WriteLine(" Press [enter] to exit.");
 Console.ReadLine();
