@@ -12,10 +12,11 @@ Nesse repositório contém meus estudos sobre RabbitMQ e exemplos de implementa�
   - [Como funciona RabbitMQ](#como-funciona-rabbitmq)
   - [Casos de Uso](#casos-de-uso)
 - [Exchanges](#exchanges)
-  - [Round Robin](#round-robin)
+  - [Round Robin](#padrão-round-robin)
   - [Fanout](#fanout)
   - [Direct](#direct)
   - [Topic](#topic)
+- [Request Reply](#request-reply)
 
 ---
 
@@ -108,6 +109,39 @@ A exchange do tipo Topic permite que as mensagens sejam roteadas para uma ou mai
 #### Casos de Uso
 - **Sistemas de Log:** Permite a entrega de logs para filas específicas com base em padrões, como níveis de severidade ou origens de log.
 - **Roteamento Dinâmico:** Utilizado para enviar mensagens para diferentes filas com base em padrões de chave de roteamento.
+
+---
+
+## [Request-Reply](https://github.com/Paulo-Ricard0/RabbitMQ-Estudos/tree/main/RMQ-Request-Reply)
+
+### Explicação
+O padrão Request-Reply no RabbitMQ é utilizado para permitir a comunicação síncrona entre um cliente (requester) e um servidor (replier). Esse padrão é comum em arquiteturas de microserviços e sistemas distribuídos onde um serviço precisa solicitar dados ou executar uma operação em outro serviço e aguardar uma resposta.
+
+#### Como Funciona
+
+1. **Produção de Mensagem (Request)**
+    - O cliente (requester) envia uma mensagem de solicitação para uma fila ou exchange específica.
+    - A mensagem inclui um identificador de correlação (correlation ID) e um endereço de resposta (reply-to), que é geralmente o nome de uma fila onde o cliente espera receber a resposta.
+
+2. **Consumo da Solicitação**
+    - O servidor (replier) consome a mensagem de solicitação da fila.
+    - O servidor processa a solicitação e gera uma resposta.
+
+
+3. **Produção de Mensagem (Reply)**
+    - O servidor envia a mensagem de resposta de volta para a fila especificada no campo reply-to da mensagem original.
+    - A resposta inclui o mesmo correlation ID para que o cliente possa associar a resposta com a solicitação correspondente.
+
+4. **Consumo da Resposta**
+    - O cliente consome a mensagem de resposta da fila de resposta.
+    - O cliente usa o correlation ID para associar a resposta com a solicitação original e processar os dados recebidos.
+
+<img alt="#" title="RabbitMQ-Request-Reply" src="https://firebasestorage.googleapis.com/v0/b/uploads-58ebc.appspot.com/o/RabbitMQ-Request-Reply.png?alt=media&token=94fac98b-68d8-45b8-b0d3-3a9bc1789d64" />
+
+#### Casos de Uso
+- **Microserviços:** Comunicação síncrona entre microserviços, onde um serviço precisa solicitar dados ou operações de outro serviço.
+- **Processamento de Solicitações:** Aplicações que exigem respostas imediatas para as solicitações enviadas, como consultas a bancos de dados ou serviços externos.
+- **Integração de Sistemas:** Conectar sistemas legados onde é necessário enviar uma solicitação e esperar uma resposta para continuar o processamento.
 
 <br>
 <p align="right"><a href="#top"><img src="https://img.shields.io/static/v1?label&message=voltar+ao+topo&color=fb8200&style=flat&logo" alt="voltar ao topo" /></a></p>
